@@ -2,8 +2,7 @@ const DotENV = require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-// Specific to WARFRAME
-const worldstateData = require('warframe-worldstate-data');
+// Specific to Clan/Warframe
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag);
@@ -52,11 +51,22 @@ function processCommand(receivedMessage) {
     // Commands
     if (primaryCommand === "help") {
         helpCommand(arguments, receivedMessage);
-    } else if (primaryCommand === "ping") {
+    } 
+        else if (primaryCommand === "ping") {
         receivedMessage.channel.send("Pong!");
-    } else if (primaryCommand === "purge") {
+    } 
+        else if (primaryCommand === "purge") {
         purgeCommand(arguments, receivedMessage);
-    }
+    } 
+        else if (primaryCommand === "commands") {
+        receivedMessage.channel.send(
+            [
+                "!help",
+                "!ping",
+                "!purge"
+            ]
+        )
+    } 
 }
 
 // Purge Command - Removes a set number of messages from chat
@@ -76,9 +86,8 @@ function helpCommand(arguments, receivedMessage) {
     if (arguments.length > 0) {
         receivedMessage.channel.send("It looks like you might need help with " + arguments);
     } else {
-        receivedMessage.channel.send("I'm not sure what you need help with. Try `/help [topic]`");
+        receivedMessage.channel.send("I'm not sure what you need help with. Try `!help [topic]` or `!commands` for a list of commands");
     }
 }
-
 
 client.login(process.env.TOKEN);
