@@ -1,13 +1,12 @@
 const DotENV = require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
-
-// Specific to Clan/Warframe
+const weather = require('weather-js');
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag);
 
-    client.user.setActivity("Warframe");
+    client.user.setActivity("Coding");
 
     client.guilds.forEach((guild) => {
         console.log(guild.name);
@@ -19,7 +18,7 @@ client.on('ready', () => {
 
     // Finds general channel and says 'greeting'
     let generalChannel = client.channels.get("547498593767129090");
-    generalChannel.send("Swazdo-Lah Tenno!");
+    generalChannel.send("I am now online! :)");
 
     // CLAN General ID: 535660178666684436
     // let generalChannel = client.channels.get("535660178666684436");
@@ -52,18 +51,42 @@ function processCommand(receivedMessage) {
     if (primaryCommand === "help") {
         helpCommand(arguments, receivedMessage);
     } 
-        else if (primaryCommand === "ping") {
-        receivedMessage.channel.send("Pong!");
+        else if (primaryCommand === "ping") { // Ping-Pong
+            receivedMessage.channel.send("Pong!");
     } 
-        else if (primaryCommand === "purge") {
-        purgeCommand(arguments, receivedMessage);
-    } 
+        else if (primaryCommand === "purge") { // Purges (Deletes) sent messages in channel - between 0 and 100
+            purgeCommand(arguments, receivedMessage);
+    }
+        else if (primaryCommand === "weather") {
+            weather.find({search: arguments.join(" "), degreetype: 'F'}, function(err, result) {
+                if (err) receivedMessage.channel.send(err);
+
+                var current = result[0].current;
+                var location = result[0].current;
+
+                const embed = new Discord.RichEmbed()
+                    .setDescription(`***${current.skytext}***`)
+                    .setAuthor(`Weather for ${current.observationpoint}`)
+                    .setTumbnail(current.imageUrl)
+                    .setColor(`0x00AE86`)
+                    .addField('Time-Zone',`UTC ${location.timezone}`, true)
+                    .addField('Degree Type:',location.degreetype, true)
+                    .addField('Temperature:',`${current.temperature} Degrees`, true)
+                    .addField('Feels Like',`${current.feelslike} Degrees`, true)
+                    .addField('Winds',`${current.winddisplay}`, true)
+                    .addField('Humidity',`${current.humidity} %`, true)
+
+                // receivedMessage.channel.send(JSON.stringify(result[0].current, null, 2));
+                receivedMessage.channel.send({embed});
+            })
+    } // List of Commands the chat-bot uses
         else if (primaryCommand === "commands") {
         receivedMessage.channel.send(
             [
                 "!help",
                 "!ping",
-                "!purge"
+                "!purge",
+                "!weather"
             ]
         )
     } 
